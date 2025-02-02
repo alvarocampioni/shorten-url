@@ -23,18 +23,21 @@ public class ShortenerController {
         this.shortenerService = shortenerService;
     }
 
+    //create short-url
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public String createShortenedUrl(@RequestBody String url){
         return baseUrl + ":" + basePort + "/" + shortenerService.createShortenedUrl(url);
     }
 
+    //get original url using short-url code
     @GetMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
     public String getUrlByCode(@RequestParam String pathCode){
         return shortenerService.getUrlByCode(pathCode);
     }
 
+    //get the number of times the link was used
     @GetMapping("/stats")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public int getAccessesByCode(@RequestParam String pathCode){

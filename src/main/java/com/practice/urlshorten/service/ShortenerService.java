@@ -26,7 +26,7 @@ public class ShortenerService {
     }
 
     public String createShortenedUrl(String url) {
-        if(!url.toLowerCase().startsWith("https://") && !url.startsWith("http://")) {
+        if(!url.toLowerCase().startsWith("https://") && !url.toLowerCase().startsWith("http://")) {
             url = "https://" + url;
         }
 

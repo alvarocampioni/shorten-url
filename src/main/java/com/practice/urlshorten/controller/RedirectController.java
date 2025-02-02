@@ -2,7 +2,6 @@ package com.practice.urlshorten.controller;
 
 import com.practice.urlshorten.service.ShortenerService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Description;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +17,7 @@ public class RedirectController {
         this.shortenerService = shortenerService;
     }
 
+    //redirects to the original url (browser)
     @GetMapping(value = "/{pathCode}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<?> redirect(@PathVariable String pathCode) {
