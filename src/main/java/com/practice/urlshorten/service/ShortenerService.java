@@ -3,6 +3,7 @@ package com.practice.urlshorten.service;
 import com.practice.urlshorten.model.Shortener;
 import com.practice.urlshorten.repository.ShortenerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -19,6 +20,10 @@ public class ShortenerService {
 
     private final ShortenerRepository shortenerRepository;
     private static final int size = 6;
+    @Value("${server.address}")
+    private String baseUrl;
+    @Value("${server.port}")
+    private int basePort;
 
     @Autowired
     public ShortenerService(ShortenerRepository shortenerRepository) {
@@ -32,7 +37,7 @@ public class ShortenerService {
 
         Shortener find = shortenerRepository.findByURL(url);
         if (find != null) {
-            return find.getShortCode();
+            return baseUrl + ":" + basePort + "/" + find.getShortCode();
         }
 
         String code;
@@ -41,7 +46,7 @@ public class ShortenerService {
         } while (!isCodeAvailable(code));
         Shortener shortener = new Shortener(url, code, new Date(), new Date(), 0);
         shortenerRepository.save(shortener);
-        return code;
+        return baseUrl + ":" + basePort + "/" + code;
     }
 
     public String getUrlByCode(String code){

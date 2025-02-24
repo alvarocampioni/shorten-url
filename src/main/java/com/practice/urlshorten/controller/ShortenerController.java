@@ -13,11 +13,6 @@ public class ShortenerController {
 
     private final ShortenerService shortenerService;
 
-    @Value("${server.address}")
-    private String baseUrl;
-    @Value("${server.port}")
-    private int basePort;
-
     @Autowired
     public ShortenerController(ShortenerService shortenerService) {
         this.shortenerService = shortenerService;
@@ -27,7 +22,7 @@ public class ShortenerController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public String createShortenedUrl(@RequestBody String url){
-        return baseUrl + ":" + basePort + "/" + shortenerService.createShortenedUrl(url);
+        return shortenerService.createShortenedUrl(url);
     }
 
     //get original url using short-url code
