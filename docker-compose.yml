@@ -1,0 +1,18 @@
+services:
+
+  shorten-url:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - SPRING_DATA_MONGODB_DATABASE=shortener
+      - SPRING_DATA_MONGODB_URI=mongodb://mongodb:27017/shortener
+
+  mongodb:
+    image: mongo
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
+

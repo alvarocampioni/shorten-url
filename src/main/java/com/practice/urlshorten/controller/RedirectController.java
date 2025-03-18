@@ -18,11 +18,13 @@ public class RedirectController {
     }
 
     //redirects to the original url (browser)
-    @GetMapping(value = "/{pathCode}")
+    @GetMapping(value = "/{shortCode}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<?> redirect(@PathVariable String pathCode) {
-        shortenerService.updateUrlValues(pathCode);
-        String url = shortenerService.getUrlByCode(pathCode);
+    public ResponseEntity<?> redirect(@PathVariable String shortCode) {
+        String baseUrl = "http://localhost:3000/";
+
+        shortenerService.updateUrlValues(baseUrl + shortCode);
+        String url = shortenerService.getUrlByShort(baseUrl + shortCode);
         if(url == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Not found");
         return ResponseEntity.status(HttpStatus.FOUND).header("Location", url).build();
     }

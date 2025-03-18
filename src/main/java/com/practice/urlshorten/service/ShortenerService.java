@@ -1,16 +1,11 @@
 package com.practice.urlshorten.service;
 
-import com.practice.urlshorten.model.Shortener;
+import com.practice.urlshorten.dto.ResponseDTO;
+import com.practice.urlshorten.model.ShortenedUrl;
 import com.practice.urlshorten.repository.ShortenerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.text.Normalizer;
 import java.util.Date;
 
 import static com.practice.urlshorten.generator.UniqueCodeGen.generateCode;
@@ -20,37 +15,36 @@ public class ShortenerService {
 
     private final ShortenerRepository shortenerRepository;
     private static final int size = 6;
-    @Value("${server.address}")
-    private String baseUrl;
-    @Value("${server.port}")
-    private int basePort;
 
     @Autowired
     public ShortenerService(ShortenerRepository shortenerRepository) {
         this.shortenerRepository = shortenerRepository;
     }
 
-    public String createShortenedUrl(String url) {
+    public ResponseDTO createShortenedUrl(String url) {
         if(!url.toLowerCase().startsWith("https://") && !url.toLowerCase().startsWith("http://")) {
             url = "https://" + url;
         }
 
-        Shortener find = shortenerRepository.findByURL(url);
+        ShortenedUrl find = shortenerRepository.findByURL(url);
         if (find != null) {
-            return baseUrl + ":" + basePort + "/" + find.getShortCode();
+            return new ResponseDTO(find.getURL(), find.getShortURL(), find.getUsed());
         }
 
         String code;
+        String baseUrl = "http://localhost:3000/";
         do {
             code = generateCode(size);
-        } while (!isCodeAvailable(code));
-        Shortener shortener = new Shortener(url, code, new Date(), new Date(), 0);
-        shortenerRepository.save(shortener);
-        return baseUrl + ":" + basePort + "/" + code;
+        } while (!isCodeAvailable(baseUrl +code));
+
+        ShortenedUrl shortenedUrl = new ShortenedUrl(url, baseUrl +code, null, null, 0);
+        shortenerRepository.save(shortenedUrl);
+
+        return new ResponseDTO(shortenedUrl.getURL(), shortenedUrl.getShortURL(), shortenedUrl.getUsed());
     }
 
-    public String getUrlByCode(String code){
-        Shortener find = shortenerRepository.findByShortCode(code);
+    public String getUrlByShort(String shortUrl){
+        ShortenedUrl find = shortenerRepository.findShortenedUrlByShortURL(shortUrl);
         if (find != null) {
             return find.getURL();
         } else {
@@ -58,8 +52,8 @@ public class ShortenerService {
         }
     }
 
-    public int getAccessesByCode(String code){
-        Shortener find = shortenerRepository.findByShortCode(code);
+    public int getAccessesByShort(String shortUrl){
+        ShortenedUrl find = shortenerRepository.findShortenedUrlByShortURL(shortUrl);
         if (find != null) {
             return find.getUsed();
         } else {
@@ -67,8 +61,8 @@ public class ShortenerService {
         }
     }
 
-    public void updateUrlValues(String code){
-        Shortener find = shortenerRepository.findByShortCode(code);
+    public void updateUrlValues(String shortUrl){
+        ShortenedUrl find = shortenerRepository.findShortenedUrlByShortURL(shortUrl);
         if(find != null){
             find.setUsed(find.getUsed() + 1);
             find.setUpdateDate(new Date());
@@ -76,8 +70,8 @@ public class ShortenerService {
         }
     }
 
-    private boolean isCodeAvailable(String code) {
-        Shortener find = shortenerRepository.findByShortCode(code);
+    private boolean isCodeAvailable(String shortUrl) {
+        ShortenedUrl find = shortenerRepository.findShortenedUrlByShortURL(shortUrl);
         return find == null;
     }
 
